@@ -1,0 +1,11 @@
+; This file is used by the knut_test.go to verify that the code is working as intended
+
+
+Name=Knut
+
+; Here is a number
+Number=532
+
+IsTrue=true
+
+
