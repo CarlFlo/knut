@@ -29,8 +29,9 @@ The variables will be loaded into a struct by the program using reflection.
 
 ```go
 type config struct {
-    Password  string
-    Port      int
+    Currency  string
+    Money     int
+    Sunny     bool
 }
 
 var config Config
