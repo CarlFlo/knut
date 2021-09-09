@@ -43,6 +43,6 @@ err := knut.Unmarshal("config.txt", &config)
 - [X] Support for basic types: string, int and bool
 - [X] Error handling
 - [X] Testing
-- [] Support for arrays
-- [] Support for additional integer types
-- [] Greater test coverage
+- [ ] Support for arrays
+- [ ] Support for additional integer types
+- [ ] Greater test coverage
