@@ -3,7 +3,6 @@ package knut
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"reflect"
 	"strconv"
@@ -41,11 +40,14 @@ func Unmarshal(path string, v interface{}) error {
 			return fmt.Errorf("invalid line: %s", line)
 		}
 
-		setFieldInStruct(parts[0], parts[1], elem)
+		err := setFieldInStruct(parts[0], parts[1], elem)
+		if err != nil {
+			return err
+		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return nil
@@ -68,42 +70,21 @@ func setFieldInStruct(fieldName, value string, elem reflect.Value) error {
 
 	switch field.Kind() {
 	case reflect.Int8:
-		err := handleInt(&value, 8, &field)
-		if err != nil {
-			return err
-		}
+		return handleInt(&value, 8, &field)
 	case reflect.Int16:
-		err := handleInt(&value, 16, &field)
-		if err != nil {
-			return err
-		}
+		return handleInt(&value, 16, &field)
 	case reflect.Int32:
-		err := handleInt(&value, 32, &field)
-		if err != nil {
-			return err
-		}
-	case reflect.Int64:
-		fallthrough
-	case reflect.Int:
-		err := handleInt(&value, 64, &field)
-		if err != nil {
-			return err
-		}
-
+		return handleInt(&value, 32, &field)
+	case reflect.Int, reflect.Int64:
+		return handleInt(&value, 64, &field)
 	case reflect.String:
 		field.SetString(value)
-
 	case reflect.Bool:
-		err := handleBool(&value, &field)
-		if err != nil {
-			return err
-		}
+		return handleBool(&value, &field)
 	case reflect.Float32:
-		handlefloat(&value, 32, &field)
-
+		return handlefloat(&value, 32, &field)
 	case reflect.Float64:
-		handlefloat(&value, 64, &field)
-
+		return handlefloat(&value, 64, &field)
 	default:
 		return fmt.Errorf("'%s' is currently unsupported", field.Kind())
 	}

@@ -3,16 +3,15 @@ package knut
 import "testing"
 
 type Config struct {
-	Name     string
-	Number   int
-	IsTrue   bool
-	F32      float32
-	F64      float64
-	ValInt8  int8
-	ValInt16 int16
-	ValInt32 int32
-	ValInt64 int64
-
+	Name       string
+	Number     int
+	IsTrue     bool
+	F32        float32
+	F64        float64
+	ValInt8    int8
+	ValInt16   int16
+	ValInt32   int32
+	ValInt64   int64
 	Uint8Value uint8
 }
 
@@ -43,13 +42,5 @@ func TestInvalidPath(t *testing.T) {
 	err := Unmarshal("test/not a real file", &config)
 	if err == nil {
 		t.Error("Expected an error")
-	}
-}
-
-func TestInvalidType(t *testing.T) {
-	var config Config
-	err := Unmarshal("test/testData_invalid.txt", &config)
-	if err != nil {
-		t.Error("Expected an error about an invalid type")
 	}
 }
