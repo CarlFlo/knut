@@ -1,6 +1,6 @@
 # Knut
 
-This is a simple module for loading data from a file into a struct.
+Knut is a simple module for loading data from a file into a struct.
 The data in the file can be commented to provide clarity to the user when the field name is not enough or ambiguous.
 
 Test converage: **83.3%**
@@ -33,7 +33,7 @@ The field followed by a '=' and then directly the value without and spaces. Empt
 The variables will be loaded into a struct by the program using reflection.
 
 ```go
-type config struct {
+type Config struct {
     Currency        string
     Money           int
     Sunny           bool
