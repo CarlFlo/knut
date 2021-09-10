@@ -8,8 +8,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-
-	"github.com/CarlFlo/malm"
 )
 
 // Unmarshal will load the file from the provided filepath and unmarshal it into the struct
@@ -69,32 +67,79 @@ func setFieldInStruct(fieldName, value string, elem reflect.Value) error {
 	}
 
 	switch field.Kind() {
-	case reflect.Int:
-
-		// cast string to int
-		inputToInt, err := strconv.Atoi(value)
+	case reflect.Int8:
+		err := handleInt(&value, 8, &field)
 		if err != nil {
-			return fmt.Errorf("%s", err)
+			return err
 		}
-
-		val := int64(inputToInt)
-		if !field.OverflowInt(val) {
-			field.SetInt(val)
+	case reflect.Int16:
+		err := handleInt(&value, 16, &field)
+		if err != nil {
+			return err
+		}
+	case reflect.Int32:
+		err := handleInt(&value, 32, &field)
+		if err != nil {
+			return err
+		}
+	case reflect.Int64:
+		fallthrough
+	case reflect.Int:
+		err := handleInt(&value, 64, &field)
+		if err != nil {
+			return err
 		}
 
 	case reflect.String:
 		field.SetString(value)
 
 	case reflect.Bool:
-		inputToBool, err := strconv.ParseBool(value)
+		err := handleBool(&value, &field)
 		if err != nil {
 			return err
 		}
-		field.SetBool(inputToBool)
+	case reflect.Float32:
+		handlefloat(&value, 32, &field)
+
+	case reflect.Float64:
+		handlefloat(&value, 64, &field)
 
 	default:
-		malm.Info("'%s' is currently unsupported", field.Kind())
+		return fmt.Errorf("'%s' is currently unsupported", field.Kind())
 	}
 
+	return nil
+}
+
+func handleInt(value *string, bitsize int, field *reflect.Value) error {
+	parsedInt, err := strconv.ParseInt(*value, 10, bitsize)
+	if err != nil {
+		return err
+	}
+
+	if field.OverflowInt(parsedInt) {
+		return fmt.Errorf("value '%s' is too large for %d bit integer", *value, bitsize)
+	}
+
+	field.SetInt(parsedInt)
+	return nil
+}
+
+func handleBool(value *string, field *reflect.Value) error {
+	inputToBool, err := strconv.ParseBool(*value)
+	if err != nil {
+		return err
+	}
+	field.SetBool(inputToBool)
+	return nil
+}
+
+func handlefloat(value *string, bitsize int, field *reflect.Value) error {
+	// bitsize 32 for float32, 64 for float64
+	inputToFloat, err := strconv.ParseFloat(*value, bitsize)
+	if err != nil {
+		return err
+	}
+	field.SetFloat(inputToFloat)
 	return nil
 }

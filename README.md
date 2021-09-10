@@ -15,7 +15,9 @@ I am making this module an exercise for myself and as something that I personall
 
 Comments and variables can be defined this way in a normal txt file.
 ```
-; this is a comment
+; this is a comment for the variable that is below it
+; It should provide a description, an example that helps 
+; the user properly use and understand the purpose of the variable
 Money=1234
 
 Currency=Dollar
