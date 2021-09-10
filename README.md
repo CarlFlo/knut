@@ -14,6 +14,7 @@ I am making this module an exercise for myself and as something that I personall
 ## Usage
 
 Comments and variables can be defined this way in a normal txt file.
+> Note: A comment and variable cannot share the same line.
 ```
 ; This is a comment for the variable that is below it.
 ; It should provide a description or an example that helps the user
@@ -43,6 +44,25 @@ type Config struct {
 var config Config
 err := knut.Unmarshal("config.txt", &config)
 ```
+
+### Format
+
+Extra whitespaces in the beginning of the line is valid
+
+```
+; These are valid
+      Name=Knut
+Code    =42
+```
+> Please be aware that trailing whitespaces on the left and right of the **value** will be kept.
+```
+; Example
+Name= Knut   
+
+; The value of Name will be interpreted as ' Knut   '. 
+; 1 Space on the left and 3 on the right side.
+```
+
 
 ## Roadmap
 - [X] Basic functionality

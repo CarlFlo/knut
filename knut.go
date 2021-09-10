@@ -28,8 +28,8 @@ func Unmarshal(path string, v interface{}) error {
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		// remove trailing whitespace
-		line = strings.TrimSpace(line)
+		// remove trailing whitespace on the left side only
+		line = strings.TrimLeft(line, " ")
 
 		if len(line) == 0 || line[0] == ';' {
 			// No data or a comment line
@@ -43,6 +43,11 @@ func Unmarshal(path string, v interface{}) error {
 		if len(parts) != 2 {
 			return fmt.Errorf("invalid line: %s", line)
 		}
+
+		// Variable names cannot contain spaces, so we remove them. Left side is already handeled
+		parts[0] = strings.TrimRight(parts[0], " ")
+		// Trims trailing whitespaces from the value
+		//parts[1] = strings.TrimSpace(parts[1])
 
 		err := setFieldInStruct(parts[0], parts[1], elem)
 		if err != nil {
