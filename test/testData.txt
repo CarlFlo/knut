@@ -1,12 +1,10 @@
 ; This file is used by the knut_test.go to verify that the code is working as intended
 
 
-Name=Knut
+ValString=Knut
 
-; Here is a number
-Number=532
 
-IsTrue=true
+ValBoolean=true
 
 F32=99.99
 F64=234.49
@@ -15,3 +13,10 @@ ValInt8=-128
 ValInt16=32767
 ValInt32=2147483647
 ValInt64=9223372036854775807
+ValInt=-9223372036854775808
+
+ValUInt8=255
+ValUInt16=65535
+ValUInt32=4294967295
+ValUInt64=18446744073709551615
+ValUInt=18446744073709551615

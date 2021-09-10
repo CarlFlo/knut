@@ -20,6 +20,10 @@ func Unmarshal(path string, v interface{}) error {
 
 	elem := reflect.ValueOf(v).Elem()
 
+	if elem.Kind() != reflect.Struct {
+		return fmt.Errorf("invalid type '%s'", elem.Kind())
+	}
+
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -55,11 +59,6 @@ func Unmarshal(path string, v interface{}) error {
 
 func setFieldInStruct(fieldName, value string, elem reflect.Value) error {
 
-	// cast interface to struct
-	if elem.Kind() != reflect.Struct {
-		return fmt.Errorf("invalid type '%s'", elem.Kind())
-	}
-
 	// exported field
 	field := elem.FieldByName(fieldName)
 
@@ -77,6 +76,14 @@ func setFieldInStruct(fieldName, value string, elem reflect.Value) error {
 		return handleInt(&value, 32, &field)
 	case reflect.Int, reflect.Int64:
 		return handleInt(&value, 64, &field)
+	case reflect.Uint8:
+		return handleUInt(&value, 8, &field)
+	case reflect.Uint16:
+		return handleUInt(&value, 16, &field)
+	case reflect.Uint32:
+		return handleUInt(&value, 32, &field)
+	case reflect.Uint, reflect.Uint64:
+		return handleUInt(&value, 64, &field)
 	case reflect.String:
 		field.SetString(value)
 	case reflect.Bool:
@@ -98,20 +105,17 @@ func handleInt(value *string, bitsize int, field *reflect.Value) error {
 		return err
 	}
 
-	if field.OverflowInt(parsedInt) {
-		return fmt.Errorf("value '%s' is too large for %d bit integer", *value, bitsize)
-	}
-
 	field.SetInt(parsedInt)
 	return nil
 }
 
-func handleBool(value *string, field *reflect.Value) error {
-	inputToBool, err := strconv.ParseBool(*value)
+func handleUInt(value *string, bitsize int, field *reflect.Value) error {
+	parsedUInt, err := strconv.ParseUint(*value, 10, bitsize)
 	if err != nil {
 		return err
 	}
-	field.SetBool(inputToBool)
+
+	field.SetUint(parsedUInt)
 	return nil
 }
 
@@ -122,5 +126,14 @@ func handlefloat(value *string, bitsize int, field *reflect.Value) error {
 		return err
 	}
 	field.SetFloat(inputToFloat)
+	return nil
+}
+
+func handleBool(value *string, field *reflect.Value) error {
+	inputToBool, err := strconv.ParseBool(*value)
+	if err != nil {
+		return err
+	}
+	field.SetBool(inputToBool)
 	return nil
 }

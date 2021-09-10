@@ -3,7 +3,7 @@
 This is a simple module for loading data from a file into a struct.
 The data in the file can be commented to provide clarity to the user when the field name is not enough or ambiguous.
 
-Test converage: **81.1%**
+Test converage: **83.3%**
 
 ## Why
 Normally, when loading a configuration file so would I just use JSON. However, JSON does not support comments, which I want for my projects as it provides added clarity and user-friendliness.
@@ -45,7 +45,6 @@ err := knut.Unmarshal("config.txt", &config)
 - [X] Support for basic types: string, int and bool
 - [X] Error handling
 - [X] Testing
-- [X] Support for signed integer types
-- [ ] Support for unsigned integer types
+- [X] Support for all integer types
 - [ ] Support for arrays
 - [ ] Greater test coverage
