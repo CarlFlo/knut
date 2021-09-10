@@ -3,7 +3,7 @@
 This is a simple module for loading data from a file into a struct.
 The data in the file can be commented to provide clarity to the user when the field name is not enough or ambiguous.
 
-Test converage: **83.8%**
+Test converage: **81.1%**
 
 ## Why
 Normally, when loading a configuration file so would I just use JSON. However, JSON does not support comments, which I want for my projects as it provides added clarity and user-friendliness.
