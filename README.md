@@ -15,14 +15,17 @@ I am making this module an exercise for myself and as something that I personall
 
 Comments and variables can be defined this way in a normal txt file.
 ```
-; this is a comment for the variable that is below it
-; It should provide a description, an example that helps 
-; the user properly use and understand the purpose of the variable
-Money=1234
+; This is a comment for the variable that is below it.
+; It should provide a description or an example that helps the user
+; properly understand the purpose of the variable and how to use it.
+Money=10520
 
-Currency=Dollar
+Currency=Krona
 
 Sunny=true
+
+; In celsius
+Temperature=23.48
 ```
 
 The field followed by a '=' and then directly the value without and spaces. Empty lines and lines starting with ';' will be ignored.
@@ -31,9 +34,10 @@ The variables will be loaded into a struct by the program using reflection.
 
 ```go
 type config struct {
-    Currency  string
-    Money     int
-    Sunny     bool
+    Currency        string
+    Money           int
+    Sunny           bool
+    Temperature     float32
 }
 
 var config Config
