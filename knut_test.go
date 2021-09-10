@@ -24,7 +24,11 @@ func validate(t *testing.T, got interface{}, expected interface{}) {
 func TestKnut(t *testing.T) {
 
 	var config Config
-	Unmarshal("test/testData.txt", &config)
+	err := Unmarshal("test/testData.txt", &config)
+
+	if err != nil {
+		t.Error("Expected no error, got ", err)
+	}
 
 	validate(t, config.Name, "Knut")
 	validate(t, config.Number, int(532))
