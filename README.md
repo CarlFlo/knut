@@ -1,5 +1,7 @@
 # Knut
 
+![Tests](https://github.com/CarlFlo/knut/actions/workflows/go.yml/badge.svg)
+
 Knut is a simple module for loading data from a file into a struct.
 The data in the file can be commented to provide clarity to the user when the field name is not enough or ambiguous.
 
