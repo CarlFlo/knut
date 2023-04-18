@@ -17,27 +17,27 @@ Thus, I am creating this module as a personal exercise and to fulfill my own nee
 Comments and variables can be defined this way in a normal txt file.
 > Note: A comment and variable cannot share the same line.
 ```
-; This is a comment for the variable that is below it.
-; It should provide a description or an example that helps the user
-; properly understand the purpose of the variable and how to use it.
+# This is a comment for the variable that is below it.
+# It should provide a description or an example that helps the user
+# properly understand the purpose of the variable and how to use it.
 Money=10520
 
 Currency=Krona
 
-; Trailing whitespaces are otherwise removed
+# Trailing whitespaces are otherwise removed
 Text=' this string will keep its spaces   '
 
 Sunny=true
-; There can be a space between the variable, =, and value
+# There can be a space between the variable, =, and value
 Values = [1,2,3,4,5]
-HelloWorld = ["Hello", "World"]
+HelloWorld = [Hello, World]
 
-; In celsius
+# In celsius
 Temperature=23.48
 Temperatures=[21.4, 18.8, 15.43]
 ```
 
-Empty lines and lines starting with ';' will be ignored.
+Empty lines and lines starting with '#' will be ignored.
 
 The variables will be loaded into a struct by the program using reflection.
 
@@ -61,7 +61,7 @@ err := knut.Unmarshal("config.txt", &config)
 Whitespaces will be trimmed, unless the text is encapsulated with single quotes '' 
 
 ```
-; These are valid
+# These are valid
       Name=   Knut   
 Code    =   42   
 ExtraSpaces = '    this string will have extra trailing spaces      '

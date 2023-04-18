@@ -31,7 +31,7 @@ func Unmarshal(path string, v interface{}) error {
 		// remove trailing whitespace on the left side only
 		line = strings.TrimLeft(line, " ")
 
-		if len(line) == 0 || line[0] == ';' {
+		if len(line) == 0 || line[0] == '#' {
 			// No data or a comment line
 			continue
 		}
@@ -92,9 +92,13 @@ func setFieldInStruct(fieldName, value string, elem reflect.Value) error {
 		return handleUInt(&value, 64, &field)
 	case reflect.String:
 
-		// remove leading and trailing ' characters
-		if len(value) >= 2 && value[0] == '\'' && value[len(value)-1] == '\'' {
-			value = value[1 : len(value)-1]
+		// remove leading and trailing ' and " characters
+		if len(value) >= 2 {
+			if value[0] == '\'' && value[len(value)-1] == '\'' {
+				value = value[1 : len(value)-1]
+			} else if value[0] == '"' && value[len(value)-1] == '"' {
+				value = value[1 : len(value)-1]
+			}
 		}
 
 		field.SetString(value)
@@ -130,9 +134,13 @@ func handleSlice(value *string, field *reflect.Value) error {
 	for i, v := range values {
 		v = strings.TrimSpace(v)
 
-		// remove leading and trailing ' characters
-		if len(v) >= 2 && v[0] == '\'' && v[len(v)-1] == '\'' {
-			v = v[1 : len(v)-1]
+		// remove leading and trailing ' and " characters
+		if len(v) >= 2 {
+			if v[0] == '\'' && v[len(v)-1] == '\'' {
+				v = v[1 : len(v)-1]
+			} else if v[0] == '"' && v[len(v)-1] == '"' {
+				v = v[1 : len(v)-1]
+			}
 		}
 
 		parsedValue, err := parseValue(v, field.Type().Elem())
