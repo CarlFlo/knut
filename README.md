@@ -5,7 +5,7 @@
 Knut is a simple module for loading data from a file into a struct.
 The data in the file can be commented to provide clarity to the user when the field name is not enough or ambiguous.
 
-Test converage: **86.3%**
+Test converage: **84.6%**
 
 ## Why
 Typically, JSON is used to load configuration files. However, JSON lacks support for comments, which I require in my projects to enhance clarity and provide a better user experience. 

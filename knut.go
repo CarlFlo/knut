@@ -9,6 +9,26 @@ import (
 	"strings"
 )
 
+type fieldHandler func(value *string, field *reflect.Value) error
+
+var fieldHandlers = map[reflect.Kind]fieldHandler{
+	reflect.Int8:    handleInt,
+	reflect.Int16:   handleInt,
+	reflect.Int32:   handleInt,
+	reflect.Int:     handleInt,
+	reflect.Int64:   handleInt,
+	reflect.Uint8:   handleUInt,
+	reflect.Uint16:  handleUInt,
+	reflect.Uint32:  handleUInt,
+	reflect.Uint:    handleUInt,
+	reflect.Uint64:  handleUInt,
+	reflect.String:  handleString,
+	reflect.Bool:    handleBool,
+	reflect.Float32: handleFloat,
+	reflect.Float64: handleFloat,
+	reflect.Slice:   handleSlice,
+}
+
 // Unmarshal will load the file from the provided filepath and unmarshal it into the struct
 func Unmarshal(path string, v interface{}) error {
 
@@ -73,51 +93,11 @@ func setFieldInStruct(fieldName, value string, elem reflect.Value) error {
 		return fmt.Errorf("invalid field '%s'", fieldName)
 	}
 
-	switch field.Kind() {
-	case reflect.Int8:
-		return handleInt(&value, 8, &field)
-	case reflect.Int16:
-		return handleInt(&value, 16, &field)
-	case reflect.Int32:
-		return handleInt(&value, 32, &field)
-	case reflect.Int, reflect.Int64:
-		return handleInt(&value, 64, &field)
-	case reflect.Uint8:
-		return handleUInt(&value, 8, &field)
-	case reflect.Uint16:
-		return handleUInt(&value, 16, &field)
-	case reflect.Uint32:
-		return handleUInt(&value, 32, &field)
-	case reflect.Uint, reflect.Uint64:
-		return handleUInt(&value, 64, &field)
-	case reflect.String:
-		preProcessString(&value)
-		field.SetString(value)
-	case reflect.Bool:
-		return handleBool(&value, &field)
-	case reflect.Float32:
-		return handlefloat(&value, 32, &field)
-	case reflect.Float64:
-		return handlefloat(&value, 64, &field)
-	case reflect.Slice:
-		return handleSlice(&value, &field)
-	default:
-		return fmt.Errorf("'%s' is currently unsupported", field.Kind())
+	if handler, ok := fieldHandlers[field.Kind()]; ok {
+		return handler(&value, &field)
 	}
 
-	return nil
-}
-
-// remove leading and trailing ' and " characters
-func preProcessString(value *string) {
-
-	if len(*value) >= 2 {
-		if (*value)[0] == '\'' && (*value)[len((*value))-1] == '\'' {
-			*value = (*value)[1 : len((*value))-1]
-		} else if (*value)[0] == '"' && (*value)[len(*value)-1] == '"' {
-			*value = (*value)[1 : len((*value))-1]
-		}
-	}
+	return fmt.Errorf("'%s' is currently unsupported", field.Kind())
 }
 
 func handleSlice(value *string, field *reflect.Value) error {
@@ -143,7 +123,7 @@ func handleSlice(value *string, field *reflect.Value) error {
 
 		preProcessString(&value)
 
-		parsedValue, err := parseValue(value, field.Type().Elem())
+		parsedValue, err := parseSliceValue(value, field.Type().Elem())
 		if err != nil {
 			return err
 		}
@@ -156,8 +136,8 @@ func handleSlice(value *string, field *reflect.Value) error {
 	return nil
 }
 
-// parseValue parses a string into a value of the given type
-func parseValue(value string, t reflect.Type) (reflect.Value, error) {
+// parseSliceValue parses a string into a value of the given type
+func parseSliceValue(value string, t reflect.Type) (reflect.Value, error) {
 	switch t.Kind() {
 	case reflect.Bool:
 
@@ -196,8 +176,14 @@ func parseValue(value string, t reflect.Type) (reflect.Value, error) {
 	}
 }
 
-func handleInt(value *string, bitsize int, field *reflect.Value) error {
-	parsedInt, err := strconv.ParseInt(*value, 10, bitsize)
+func handleString(value *string, field *reflect.Value) error {
+	preProcessString(value)
+	field.SetString(*value)
+	return nil
+}
+
+func handleInt(value *string, field *reflect.Value) error {
+	parsedInt, err := strconv.ParseInt(*value, 10, 64)
 	if err != nil {
 		return err
 	}
@@ -206,8 +192,8 @@ func handleInt(value *string, bitsize int, field *reflect.Value) error {
 	return nil
 }
 
-func handleUInt(value *string, bitsize int, field *reflect.Value) error {
-	parsedUInt, err := strconv.ParseUint(*value, 10, bitsize)
+func handleUInt(value *string, field *reflect.Value) error {
+	parsedUInt, err := strconv.ParseUint(*value, 10, 64)
 	if err != nil {
 		return err
 	}
@@ -216,9 +202,8 @@ func handleUInt(value *string, bitsize int, field *reflect.Value) error {
 	return nil
 }
 
-func handlefloat(value *string, bitsize int, field *reflect.Value) error {
-	// bitsize 32 for float32, 64 for float64
-	inputToFloat, err := strconv.ParseFloat(*value, bitsize)
+func handleFloat(value *string, field *reflect.Value) error {
+	inputToFloat, err := strconv.ParseFloat(*value, 64)
 	if err != nil {
 		return err
 	}
@@ -233,4 +218,16 @@ func handleBool(value *string, field *reflect.Value) error {
 	}
 	field.SetBool(inputToBool)
 	return nil
+}
+
+// remove leading and trailing ' and " characters
+func preProcessString(value *string) {
+
+	if len(*value) >= 2 {
+		if (*value)[0] == '\'' && (*value)[len((*value))-1] == '\'' {
+			*value = (*value)[1 : len((*value))-1]
+		} else if (*value)[0] == '"' && (*value)[len(*value)-1] == '"' {
+			*value = (*value)[1 : len((*value))-1]
+		}
+	}
 }
