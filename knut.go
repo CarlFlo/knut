@@ -91,16 +91,7 @@ func setFieldInStruct(fieldName, value string, elem reflect.Value) error {
 	case reflect.Uint, reflect.Uint64:
 		return handleUInt(&value, 64, &field)
 	case reflect.String:
-
-		// remove leading and trailing ' and " characters
-		if len(value) >= 2 {
-			if value[0] == '\'' && value[len(value)-1] == '\'' {
-				value = value[1 : len(value)-1]
-			} else if value[0] == '"' && value[len(value)-1] == '"' {
-				value = value[1 : len(value)-1]
-			}
-		}
-
+		preProcessString(&value)
 		field.SetString(value)
 	case reflect.Bool:
 		return handleBool(&value, &field)
@@ -117,10 +108,26 @@ func setFieldInStruct(fieldName, value string, elem reflect.Value) error {
 	return nil
 }
 
+// remove leading and trailing ' and " characters
+func preProcessString(value *string) {
+
+	if len(*value) >= 2 {
+		if (*value)[0] == '\'' && (*value)[len((*value))-1] == '\'' {
+			*value = (*value)[1 : len((*value))-1]
+		} else if (*value)[0] == '"' && (*value)[len(*value)-1] == '"' {
+			*value = (*value)[1 : len((*value))-1]
+		}
+	}
+}
+
 func handleSlice(value *string, field *reflect.Value) error {
 
 	// This function parses a string in this format [value1, value2, value3, ...] and returns a slice
 	// of the parsed values
+
+	if (*value)[0] != '[' && len(*value)-1 != ']' {
+		return fmt.Errorf("invalid slice format: %s", *value)
+	}
 
 	*value = (*value)[1 : len(*value)-1]
 
@@ -131,19 +138,12 @@ func handleSlice(value *string, field *reflect.Value) error {
 	slice := reflect.MakeSlice(field.Type(), len(values), len(values))
 
 	// Parse each value and add it to the slice
-	for i, v := range values {
-		v = strings.TrimSpace(v)
+	for i, value := range values {
+		value = strings.TrimSpace(value)
 
-		// remove leading and trailing ' and " characters
-		if len(v) >= 2 {
-			if v[0] == '\'' && v[len(v)-1] == '\'' {
-				v = v[1 : len(v)-1]
-			} else if v[0] == '"' && v[len(v)-1] == '"' {
-				v = v[1 : len(v)-1]
-			}
-		}
+		preProcessString(&value)
 
-		parsedValue, err := parseValue(v, field.Type().Elem())
+		parsedValue, err := parseValue(value, field.Type().Elem())
 		if err != nil {
 			return err
 		}
@@ -160,27 +160,37 @@ func handleSlice(value *string, field *reflect.Value) error {
 func parseValue(value string, t reflect.Type) (reflect.Value, error) {
 	switch t.Kind() {
 	case reflect.Bool:
-		return reflect.ValueOf(strings.ToLower(value) == "true"), nil
+
+		inputToBool, err := strconv.ParseBool(value)
+		if err != nil {
+			return reflect.Value{}, fmt.Errorf("invalid input for bool: %s", value)
+		}
+		return reflect.ValueOf(inputToBool), nil
+
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		parsedValue, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
 			return reflect.Value{}, err
 		}
 		return reflect.ValueOf(parsedValue).Convert(t), nil
+
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		parsedValue, err := strconv.ParseUint(value, 10, 64)
 		if err != nil {
 			return reflect.Value{}, err
 		}
 		return reflect.ValueOf(parsedValue).Convert(t), nil
+
 	case reflect.Float32, reflect.Float64:
 		parsedValue, err := strconv.ParseFloat(value, 64)
 		if err != nil {
 			return reflect.Value{}, err
 		}
 		return reflect.ValueOf(parsedValue).Convert(t), nil
+
 	case reflect.String:
 		return reflect.ValueOf(value), nil
+
 	default:
 		return reflect.Value{}, fmt.Errorf("unsupported type: %v", t)
 	}

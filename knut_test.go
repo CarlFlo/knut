@@ -111,3 +111,19 @@ func TestInvalidPath(t *testing.T) {
 		t.Error("Expected an error")
 	}
 }
+
+func TestInvalidLine(t *testing.T) {
+	var config Config
+	err := Unmarshal("test/invalidSlice.txt", &config)
+	if err == nil {
+		t.Error("Expected an error")
+	}
+}
+
+func TestInvalidBoolean(t *testing.T) {
+	var config Config
+	err := Unmarshal("test/invalidBoolean.txt", &config)
+	if err == nil {
+		t.Error("Expected an error")
+	}
+}
