@@ -56,6 +56,15 @@ var config Config
 err := knut.Unmarshal("config.txt", &config)
 ```
 
+### Supported types
+- int8, int16, int32 & int
+- uint8, uint16, uint32 & uint
+- string
+- bool
+- float32 & float64
+
+Slices for all listed types above are also supported
+
 ### Format
 
 Whitespaces will be trimmed, unless the text is encapsulated with single or double quotes ' "
