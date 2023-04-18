@@ -44,10 +44,11 @@ func Unmarshal(path string, v interface{}) error {
 			return fmt.Errorf("invalid line: %s", line)
 		}
 
-		// Variable names cannot contain spaces, so we remove them. Left side is already handeled
+		// Remove trailing whitespaces from the variable name
 		parts[0] = strings.TrimRight(parts[0], " ")
+
 		// Trims trailing whitespaces from the value
-		//parts[1] = strings.TrimSpace(parts[1])
+		parts[1] = strings.TrimSpace(parts[1])
 
 		err := setFieldInStruct(parts[0], parts[1], elem)
 		if err != nil {
@@ -90,6 +91,12 @@ func setFieldInStruct(fieldName, value string, elem reflect.Value) error {
 	case reflect.Uint, reflect.Uint64:
 		return handleUInt(&value, 64, &field)
 	case reflect.String:
+
+		// remove leading and trailing ' characters
+		if len(value) >= 2 && value[0] == '\'' && value[len(value)-1] == '\'' {
+			value = value[1 : len(value)-1]
+		}
+
 		field.SetString(value)
 	case reflect.Bool:
 		return handleBool(&value, &field)
@@ -97,11 +104,78 @@ func setFieldInStruct(fieldName, value string, elem reflect.Value) error {
 		return handlefloat(&value, 32, &field)
 	case reflect.Float64:
 		return handlefloat(&value, 64, &field)
+	case reflect.Slice:
+		return handleSlice(&value, &field)
 	default:
 		return fmt.Errorf("'%s' is currently unsupported", field.Kind())
 	}
 
 	return nil
+}
+
+func handleSlice(value *string, field *reflect.Value) error {
+
+	// This function parses a string in this format [value1, value2, value3, ...] and returns a slice
+	// of the parsed values
+
+	*value = (*value)[1 : len(*value)-1]
+
+	// Split the string into individual values
+	values := strings.Split(*value, ",")
+
+	// Create a new slice of the appropriate type
+	slice := reflect.MakeSlice(field.Type(), len(values), len(values))
+
+	// Parse each value and add it to the slice
+	for i, v := range values {
+		v = strings.TrimSpace(v)
+
+		// remove leading and trailing ' characters
+		if len(v) >= 2 && v[0] == '\'' && v[len(v)-1] == '\'' {
+			v = v[1 : len(v)-1]
+		}
+
+		parsedValue, err := parseValue(v, field.Type().Elem())
+		if err != nil {
+			return err
+		}
+		slice.Index(i).Set(parsedValue)
+	}
+
+	// Set the value of the field to the new slice
+	field.Set(slice)
+
+	return nil
+}
+
+// parseValue parses a string into a value of the given type
+func parseValue(value string, t reflect.Type) (reflect.Value, error) {
+	switch t.Kind() {
+	case reflect.Bool:
+		return reflect.ValueOf(strings.ToLower(value) == "true"), nil
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		parsedValue, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		return reflect.ValueOf(parsedValue).Convert(t), nil
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		parsedValue, err := strconv.ParseUint(value, 10, 64)
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		return reflect.ValueOf(parsedValue).Convert(t), nil
+	case reflect.Float32, reflect.Float64:
+		parsedValue, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		return reflect.ValueOf(parsedValue).Convert(t), nil
+	case reflect.String:
+		return reflect.ValueOf(value), nil
+	default:
+		return reflect.Value{}, fmt.Errorf("unsupported type: %v", t)
+	}
 }
 
 func handleInt(value *string, bitsize int, field *reflect.Value) error {

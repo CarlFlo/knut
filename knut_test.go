@@ -1,10 +1,22 @@
 package knut
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 type Config struct {
-	ValString  string
-	ValBoolean bool
+	ValString         string
+	ValString2        string
+	ValTrailingString string
+	ValBoolean        bool
+
+	ValSliceString []string
+	ValSliceInt    []int
+	ValSliceUInt   []uint
+	ValSliceF32    []float32
+	ValSliceF64    []float64
+	ValSliceBool   []bool
 
 	F32 float32
 	F64 float64
@@ -24,7 +36,7 @@ type Config struct {
 
 func validate(t *testing.T, got interface{}, expected interface{}) {
 	if got != expected {
-		t.Error("Expected ", expected, ", got ", got)
+		t.Errorf("Expected %v (%s), got %v (%s)", expected, reflect.TypeOf(expected), got, reflect.TypeOf(got))
 	}
 }
 
@@ -38,7 +50,37 @@ func TestKnut(t *testing.T) {
 	}
 
 	validate(t, config.ValString, "Knut")
+	validate(t, config.ValString2, "   Knut       ")
+	validate(t, config.ValTrailingString, "noTrail")
 	validate(t, config.ValBoolean, true)
+
+	validate(t, config.ValSliceString[0], "1")
+	validate(t, config.ValSliceString[1], "2")
+	validate(t, config.ValSliceString[2], "3")
+	validate(t, config.ValSliceString[3], "4")
+	validate(t, config.ValSliceString[4], " extra white spaces     ")
+
+	validate(t, config.ValSliceInt[0], 1)
+	validate(t, config.ValSliceInt[1], 2)
+	validate(t, config.ValSliceInt[2], 3)
+	validate(t, config.ValSliceInt[3], -4)
+
+	validate(t, config.ValSliceUInt[0], uint(1))
+	validate(t, config.ValSliceUInt[1], uint(2))
+	validate(t, config.ValSliceUInt[2], uint(3))
+	validate(t, config.ValSliceUInt[3], uint(503))
+
+	validate(t, config.ValSliceF32[0], float32(35.56))
+	validate(t, config.ValSliceF32[1], float32(1005.99))
+	validate(t, config.ValSliceF32[2], float32(9999.99))
+
+	validate(t, config.ValSliceF64[0], float64(1.56))
+	validate(t, config.ValSliceF64[1], float64(89765.9))
+	validate(t, config.ValSliceF64[2], float64(12345.67))
+
+	validate(t, config.ValSliceBool[0], true)
+	validate(t, config.ValSliceBool[1], true)
+	validate(t, config.ValSliceBool[2], false)
 
 	validate(t, config.F32, float32(99.99))
 	validate(t, config.F64, float64(234.49))

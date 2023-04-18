@@ -2,9 +2,19 @@
 
 
 ValString=Knut
-
+ValString2='   Knut       '
+            ValTrailingString        =                         noTrail                               
 
 ValBoolean=true
+
+ValSliceString=[1,2 ,  3 ,  4, ' extra white spaces     ']
+ValSliceInt=[1,2 ,  3 ,  -4]
+ValSliceUInt=[1,2 ,  3 ,  503]
+
+ValSliceF32= [35.56, 1005.99, 9999.99]
+ValSliceF64 = [1.56, 89765.9, 12345.67]
+
+ValSliceBool = [true, true  , false    ]
 
 F32=99.99
 F64=234.49

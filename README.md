@@ -5,13 +5,12 @@
 Knut is a simple module for loading data from a file into a struct.
 The data in the file can be commented to provide clarity to the user when the field name is not enough or ambiguous.
 
-Test converage: **83.3%**
+Test converage: **84.0%**
 
 ## Why
-Normally, when loading a configuration file so would I just use JSON. However, JSON does not support comments, which I want for my projects as it provides added clarity and user-friendliness.
+Typically, JSON is used to load configuration files. However, JSON lacks support for comments, which I require in my projects to enhance clarity and provide a better user experience. 
 
-
-I am making this module an exercise for myself and as something that I personally need.
+Thus, I am creating this module as a personal exercise and to fulfill my own needs.
 
 ## Usage
 
@@ -25,22 +24,32 @@ Money=10520
 
 Currency=Krona
 
+; Trailing whitespaces are otherwise removed
+Text=' this string will keep its spaces   '
+
 Sunny=true
+; There can be a space between the variable, =, and value
+Values = [1,2,3,4,5]
+HelloWorld = ["Hello", "World"]
 
 ; In celsius
 Temperature=23.48
+Temperatures=[21.4, 18.8, 15.43]
 ```
 
-The field followed by a '=' and then directly the value without and spaces. Empty lines and lines starting with ';' will be ignored.
+Empty lines and lines starting with ';' will be ignored.
 
 The variables will be loaded into a struct by the program using reflection.
 
 ```go
 type Config struct {
     Currency        string
+    Text            string
     Money           int
     Sunny           bool
+    HelloWorld      []string
     Temperature     float32
+    Temperatures    []float32
 }
 
 var config Config
@@ -49,20 +58,13 @@ err := knut.Unmarshal("config.txt", &config)
 
 ### Format
 
-Extra whitespaces in the beginning of the line is valid
+Whitespaces will be trimmed, unless the text is encapsulated with single quotes '' 
 
 ```
 ; These are valid
-      Name=Knut
-Code    =42
-```
-> Please be aware that trailing whitespaces on the left and right of the **value** will be kept.
-```
-; Example
-Name= Knut   
-
-; The value of Name will be interpreted as ' Knut   '. 
-; 1 Space on the left and 3 on the right side.
+      Name=   Knut   
+Code    =   42   
+ExtraSpaces = '    this string will have extra trailing spaces      '
 ```
 
 
@@ -72,5 +74,7 @@ Name= Knut
 - [X] Error handling
 - [X] Testing
 - [X] Support for all integer types and float
-- [ ] Support for arrays
+- [X] Support for slices
+- [ ] Support for maps
+- [ ] Support for slices with custom types
 - [ ] Greater test coverage
