@@ -58,7 +58,7 @@ err := knut.Unmarshal("config.txt", &config)
 
 ### Format
 
-Whitespaces will be trimmed, unless the text is encapsulated with single quotes '' 
+Whitespaces will be trimmed, unless the text is encapsulated with single or double quotes ' "
 
 ```
 # These are valid
