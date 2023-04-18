@@ -8,6 +8,7 @@ ValString2='   Knut       '
 ValBoolean=true
 
 ValSliceString=[1,2 ,  3 ,  4, ' extra white spaces     ']
+ValSliceString2=["Hello","World", "  :) "]
 ValSliceInt=[1,2 ,  3 ,  -4]
 ValSliceUInt=[1,2 ,  3 ,  503]
 

@@ -6,17 +6,19 @@ import (
 )
 
 type Config struct {
-	ValString         string
-	ValString2        string
-	ValTrailingString string
-	ValBoolean        bool
+	ValString          string
+	ValString2         string
+	ValTrailingString  string
+	ValTrailingString2 string
+	ValBoolean         bool
 
-	ValSliceString []string
-	ValSliceInt    []int
-	ValSliceUInt   []uint
-	ValSliceF32    []float32
-	ValSliceF64    []float64
-	ValSliceBool   []bool
+	ValSliceString  []string
+	ValSliceString2 []string
+	ValSliceInt     []int
+	ValSliceUInt    []uint
+	ValSliceF32     []float32
+	ValSliceF64     []float64
+	ValSliceBool    []bool
 
 	F32 float32
 	F64 float64
@@ -59,6 +61,10 @@ func TestKnut(t *testing.T) {
 	validate(t, config.ValSliceString[2], "3")
 	validate(t, config.ValSliceString[3], "4")
 	validate(t, config.ValSliceString[4], " extra white spaces     ")
+
+	validate(t, config.ValSliceString2[0], "Hello")
+	validate(t, config.ValSliceString2[1], "World")
+	validate(t, config.ValSliceString2[2], "  :) ")
 
 	validate(t, config.ValSliceInt[0], 1)
 	validate(t, config.ValSliceInt[1], 2)
