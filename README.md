@@ -62,7 +62,7 @@ Whitespaces will be trimmed unless the text is encapsulated with single or doubl
 
 ```
 # These are valid
-      Name=   Knut   
+      Name=   Knut Knutson  
 Code    =   42   
 ExtraSpaces = '    this string will have extra trailing spaces      '
 ```
