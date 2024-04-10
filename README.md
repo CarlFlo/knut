@@ -3,18 +3,18 @@
 ![Tests](https://github.com/CarlFlo/knut/actions/workflows/go.yml/badge.svg)
 
 Knut is a simple module for loading data from a file into a struct.
-The data in the file can be commented to provide clarity to the user when the field name is not enough or ambiguous.
+The data in the file can be commented on to provide clarity to the user when the field name is not enough or ambiguous.
 
 Test converage: **84.6%**
 
 ## Why
 Typically, JSON is used to load configuration files. However, JSON lacks support for comments, which I require in my projects to enhance clarity and provide a better user experience. 
 
-Thus, I am creating this module as a personal exercise and to fulfill my own needs.
+Thus, I am creating this module as a personal exercise to fulfil my needs.
 
 ## Usage
 
-Comments and variables can be defined this way in a normal txt file.
+Comments and variables can be defined this way in a regular txt file.
 > Note: A comment and variable cannot share the same line.
 ```
 # This is a comment for the variable that is below it.
@@ -58,7 +58,7 @@ err := knut.Unmarshal("config.txt", &config)
 
 ### Format
 
-Whitespaces will be trimmed, unless the text is encapsulated with single or double quotes ' "
+Whitespaces will be trimmed unless the text is encapsulated with single or double quotes ' "
 
 ```
 # These are valid
@@ -83,6 +83,4 @@ Slices for all listed types above are also supported
 - [X] Testing
 - [X] Support for all integer types and float
 - [X] Support for slices
-- [ ] Support for maps
-- [ ] Support for slices with custom types
 - [ ] Greater test coverage
